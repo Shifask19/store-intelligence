@@ -1,0 +1,24 @@
+# Dockerfile.railway — for Render/Railway free-tier deployment
+# Uses SQLite (no external DB), seeds demo events on first boot.
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+# Install without asyncpg (not needed for SQLite deployment)
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app/      ./app/
+COPY pipeline/ ./pipeline/
+COPY data/     ./data/
+COPY scripts/  ./scripts/
+
+RUN chmod +x scripts/startup.sh
+
+EXPOSE 8000
+
+CMD ["bash", "scripts/startup.sh"]

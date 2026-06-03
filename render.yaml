@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: store-intelligence-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile.railway
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        value: sqlite+aiosqlite:///./demo.db
+      - key: PORT
+        value: 8000
