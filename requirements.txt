@@ -1,0 +1,33 @@
+# Core API
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.10.3
+
+# Database
+sqlalchemy==2.0.36
+asyncpg==0.30.0
+aiosqlite==0.20.0          # for tests / SQLite fallback
+alembic==1.14.0
+
+# Detection pipeline
+ultralytics==8.3.40        # YOLOv8 + ByteTrack built-in
+supervision==0.28.0        # ByteTrack wrapper (renamed from ByteTracker in 0.22+)
+opencv-python-headless==4.10.0.84
+numpy==1.26.4
+
+# Dashboard
+rich==13.9.4               # terminal live dashboard (Part E)
+websockets==14.1           # for web dashboard streaming
+
+# HTTP client (tests)
+httpx==0.28.1
+
+# Testing
+pytest==8.3.4
+pytest-asyncio==0.24.0
+pytest-cov==6.0.0
+greenlet==3.1.1             # required for accurate async coverage tracing
+
+# Utilities
+python-multipart==0.0.12   # FastAPI file uploads
+aiofiles==24.1.0

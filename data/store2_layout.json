@@ -1,0 +1,50 @@
+{
+  "store_id": "ST1009",
+  "store_name": "Store 2",
+  "cameras": [
+    {
+      "camera_id": "CAM_ENTRY_01",
+      "source_file": "entry 1.mp4",
+      "type": "entry_exit",
+      "entry_line": {"x1": 0, "y1": 400, "x2": 1920, "y2": 400},
+      "entry_direction": "up_to_down",
+      "zones_covered": ["ENTRY_ZONE"]
+    },
+    {
+      "camera_id": "CAM_ENTRY_02",
+      "source_file": "entry 2.mp4",
+      "type": "entry_exit",
+      "entry_line": {"x1": 0, "y1": 400, "x2": 1920, "y2": 400},
+      "entry_direction": "up_to_down",
+      "zones_covered": ["ENTRY_ZONE"]
+    },
+    {
+      "camera_id": "CAM_ZONE_01",
+      "source_file": "zone.mp4",
+      "type": "floor",
+      "entry_line": null,
+      "zones_covered": ["SKINCARE", "MAKEUP", "HAIRCARE"]
+    },
+    {
+      "camera_id": "CAM_BILLING_01",
+      "source_file": "billing_area.mp4",
+      "type": "billing",
+      "entry_line": null,
+      "zones_covered": ["BILLING"]
+    }
+  ],
+  "zones": [
+    {"zone_id": "ENTRY_ZONE", "zone_name": "Entry Zone",     "sku_zone": null,          "bbox": [0, 350, 1920, 450], "is_billing": false},
+    {"zone_id": "SKINCARE",   "zone_name": "Skincare Shelf", "sku_zone": "MOISTURISER", "bbox": [0, 0, 640, 1080],   "is_billing": false},
+    {"zone_id": "MAKEUP",     "zone_name": "Makeup Display", "sku_zone": "FOUNDATION",  "bbox": [640, 0, 1280, 1080],"is_billing": false},
+    {"zone_id": "HAIRCARE",   "zone_name": "Haircare Aisle", "sku_zone": "SHAMPOO",     "bbox": [1280, 0, 1920, 1080],"is_billing": false},
+    {"zone_id": "BILLING",    "zone_name": "Billing Counter Queue", "sku_zone": null,   "bbox": [0, 0, 1920, 1080],  "is_billing": true}
+  ],
+  "staff_detection": {
+    "uniform_hsv_ranges": [
+      {"label": "black", "h_min": 0, "h_max": 180, "s_min": 0, "s_max": 50, "v_min": 0, "v_max": 60}
+    ],
+    "uniform_coverage_threshold": 0.35
+  },
+  "reentry_window_minutes": 30
+}

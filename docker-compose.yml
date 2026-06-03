@@ -1,0 +1,71 @@
+# docker compose up — starts everything, no manual steps beyond git clone.
+# Services: api, postgres, dashboard
+
+services:
+
+  # -------------------------------------------------------------------------
+  # PostgreSQL — primary event store
+  # -------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: store_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: store_user
+      POSTGRES_PASSWORD: store_pass
+      POSTGRES_DB: store_intelligence
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init_pos.sql:/docker-entrypoint-initdb.d/01_init_pos.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U store_user -d store_intelligence"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # -------------------------------------------------------------------------
+  # Store Intelligence API
+  # -------------------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: store_api
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+asyncpg://store_user:store_pass@postgres:5432/store_intelligence
+      LOG_LEVEL: info
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # -------------------------------------------------------------------------
+  # Live Dashboard (Part E — terminal + web)
+  # -------------------------------------------------------------------------
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile.dashboard
+    container_name: store_dashboard
+    restart: unless-stopped
+    environment:
+      API_URL: http://api:8000
+      STORE_ID: STORE_BLR_002
+      REFRESH_SECONDS: "5"
+    ports:
+      - "8080:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

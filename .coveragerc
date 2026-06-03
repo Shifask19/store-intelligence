@@ -1,0 +1,16 @@
+[run]
+branch = False
+concurrency = greenlet
+source = app,pipeline
+omit =
+    */tests/*
+    */__pycache__/*
+    */migrations/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    pass

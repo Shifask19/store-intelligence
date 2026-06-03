@@ -1,0 +1,131 @@
+{
+  "store_id": "STORE_BLR_002",
+  "store_name": "Brigade_Bangalore",
+  "city": "Bangalore",
+  "address": "Brigade Road, Bangalore",
+  "open_hours": { "open": "10:00", "close": "22:00" },
+  "cameras": [
+    {
+      "camera_id": "CAM_ENTRY_01",
+      "source_file": "CAM 1.mp4",
+      "type": "entry_exit",
+      "description": "Main entry/exit threshold camera",
+      "entry_line": { "x1": 0, "y1": 540, "x2": 1920, "y2": 540 },
+      "entry_direction": "up_to_down",
+      "zones_covered": ["ENTRY_ZONE"]
+    },
+    {
+      "camera_id": "CAM_FLOOR_02",
+      "source_file": "CAM 2.mp4",
+      "type": "floor",
+      "description": "Main floor zone coverage",
+      "entry_line": null,
+      "zones_covered": ["SKINCARE", "MAKEUP", "HAIRCARE", "FRAGRANCE"]
+    },
+    {
+      "camera_id": "CAM_FLOOR_03",
+      "source_file": "CAM 3.mp4",
+      "type": "floor",
+      "description": "Secondary floor coverage",
+      "entry_line": null,
+      "zones_covered": ["PERSONAL_CARE", "WELLNESS", "ACCESSORIES"]
+    },
+    {
+      "camera_id": "CAM_BILLING_04",
+      "source_file": "CAM 4.mp4",
+      "type": "billing",
+      "description": "Billing counter area",
+      "entry_line": null,
+      "zones_covered": ["BILLING"]
+    },
+    {
+      "camera_id": "CAM_BILLING_05",
+      "source_file": "CAM 5.mp4",
+      "type": "billing",
+      "description": "Secondary billing / queue area",
+      "entry_line": null,
+      "zones_covered": ["BILLING_QUEUE"]
+    }
+  ],
+  "zones": [
+    {
+      "zone_id": "ENTRY_ZONE",
+      "sku_zone": null,
+      "camera_id": "CAM_ENTRY_01",
+      "bbox": [0, 480, 1920, 600],
+      "is_billing": false
+    },
+    {
+      "zone_id": "SKINCARE",
+      "sku_zone": "MOISTURISER",
+      "camera_id": "CAM_FLOOR_02",
+      "bbox": [0, 0, 960, 540],
+      "is_billing": false
+    },
+    {
+      "zone_id": "MAKEUP",
+      "sku_zone": "FOUNDATION",
+      "camera_id": "CAM_FLOOR_02",
+      "bbox": [960, 0, 1920, 540],
+      "is_billing": false
+    },
+    {
+      "zone_id": "HAIRCARE",
+      "sku_zone": "SHAMPOO",
+      "camera_id": "CAM_FLOOR_02",
+      "bbox": [0, 540, 960, 1080],
+      "is_billing": false
+    },
+    {
+      "zone_id": "FRAGRANCE",
+      "sku_zone": "PERFUME",
+      "camera_id": "CAM_FLOOR_02",
+      "bbox": [960, 540, 1920, 1080],
+      "is_billing": false
+    },
+    {
+      "zone_id": "PERSONAL_CARE",
+      "sku_zone": "BODYCARE",
+      "camera_id": "CAM_FLOOR_03",
+      "bbox": [0, 0, 960, 540],
+      "is_billing": false
+    },
+    {
+      "zone_id": "WELLNESS",
+      "sku_zone": "SUPPLEMENTS",
+      "camera_id": "CAM_FLOOR_03",
+      "bbox": [960, 0, 1920, 540],
+      "is_billing": false
+    },
+    {
+      "zone_id": "ACCESSORIES",
+      "sku_zone": "TOOLS",
+      "camera_id": "CAM_FLOOR_03",
+      "bbox": [0, 540, 1920, 1080],
+      "is_billing": false
+    },
+    {
+      "zone_id": "BILLING",
+      "sku_zone": null,
+      "camera_id": "CAM_BILLING_04",
+      "bbox": [0, 0, 1920, 1080],
+      "is_billing": true
+    },
+    {
+      "zone_id": "BILLING_QUEUE",
+      "sku_zone": null,
+      "camera_id": "CAM_BILLING_05",
+      "bbox": [0, 0, 1920, 1080],
+      "is_billing": true
+    }
+  ],
+  "staff_detection": {
+    "uniform_hsv_ranges": [
+      { "label": "black_uniform", "h_min": 0, "h_max": 180, "s_min": 0, "s_max": 50, "v_min": 0, "v_max": 60 },
+      { "label": "purple_uniform", "h_min": 130, "h_max": 160, "s_min": 50, "s_max": 255, "v_min": 50, "v_max": 200 }
+    ],
+    "uniform_coverage_threshold": 0.35
+  },
+  "reentry_window_minutes": 30,
+  "pos_correlation_window_minutes": 5
+}
