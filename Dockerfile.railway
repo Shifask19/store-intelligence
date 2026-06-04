@@ -1,5 +1,5 @@
 # Dockerfile.railway — Render/Railway free-tier deployment
-# Uses SQLite (no external DB), seeds demo events on first boot.
+# SQLite only — no external DB needed. Seeds demo data on first boot.
 
 FROM python:3.11-slim
 
@@ -8,9 +8,19 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends gcc \
     && rm -rf /var/lib/apt/lists/*
 
+# Install deps — skip asyncpg (not needed for SQLite)
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir \
+    fastapi==0.115.5 \
+    uvicorn[standard]==0.32.1 \
+    pydantic==2.10.3 \
+    sqlalchemy==2.0.36 \
+    aiosqlite==0.20.0 \
+    python-multipart==0.0.12 \
+    aiofiles==24.1.0 \
+    rich==13.9.4
 
+# Copy app code and data
 COPY app/      ./app/
 COPY pipeline/ ./pipeline/
 COPY data/     ./data/
@@ -18,7 +28,7 @@ COPY scripts/  ./scripts/
 
 RUN chmod +x scripts/startup.sh
 
-# Force SQLite — no external DB needed
+# Force SQLite
 ENV DATABASE_URL="sqlite+aiosqlite:///./demo.db"
 ENV DB_NULL_POOL="false"
 
