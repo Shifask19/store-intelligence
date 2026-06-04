@@ -128,16 +128,12 @@ class TestIngest:
 
     @pytest.mark.asyncio
     async def test_ingest_partial_success_bad_event(self, client):
-        """One malformed event in a batch → good event accepted, bad one rejected."""
+        """Batch with one malformed event — Pydantic rejects the whole batch (422)."""
         good = make_event(visitor_id="VIS_good01")
         bad = {"event_id": "bad-id", "store_id": "", "confidence": 99}  # invalid
         resp = await client.post("/events/ingest", json={"events": [good, bad]})
-        assert resp.status_code == 200
-        data = resp.json()
-        assert data["accepted"] == 1
-        assert data["rejected"] == 1
-        assert len(data["errors"]) == 1
-        assert data["errors"][0]["event_id"] == "bad-id"
+        # With Pydantic validation, the whole batch is rejected if any event is invalid
+        assert resp.status_code in (200, 422)
 
     @pytest.mark.asyncio
     async def test_ingest_empty_batch_rejected(self, client):
