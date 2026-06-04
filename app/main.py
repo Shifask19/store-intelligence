@@ -31,6 +31,95 @@ from app.heatmap import router as heatmap_router
 from app.anomalies import router as anomalies_router
 from app.health import router as health_router
 
+
+# ---------------------------------------------------------------------------
+# Demo data seeding — runs on every startup when DB is empty
+# (needed for Render/Railway free tier where storage is ephemeral)
+# ---------------------------------------------------------------------------
+async def _seed_demo_data_if_empty():
+    """Seed events_final.jsonl into DB if empty. Safe to call multiple times."""
+    import json
+    import os
+    from pathlib import Path
+    from datetime import datetime, timezone
+    from sqlalchemy import text
+    from app.database import AsyncSessionLocal
+
+    events_file = Path(__file__).parent.parent / "data" / "events_final.jsonl"
+    if not events_file.exists():
+        return
+
+    async with AsyncSessionLocal() as session:
+        try:
+            result = await session.execute(text("SELECT COUNT(*) FROM events"))
+            count = result.scalar() or 0
+            if count > 0:
+                logger.info(f"DB already has {count} events — skipping seed")
+                return
+
+            lines = [l.strip() for l in events_file.open() if l.strip()]
+            logger.info(f"Seeding {len(lines)} events into empty DB...")
+            now = datetime.now(timezone.utc).isoformat()
+
+            insert_sql = text("""
+                INSERT OR IGNORE INTO events (
+                    event_id, store_id, camera_id, visitor_id, event_type,
+                    timestamp, zone_id, dwell_ms, is_staff, confidence,
+                    queue_depth, sku_zone, session_seq, ingested_at
+                ) VALUES (
+                    :event_id,:store_id,:camera_id,:visitor_id,:event_type,
+                    :timestamp,:zone_id,:dwell_ms,:is_staff,:confidence,
+                    :queue_depth,:sku_zone,:session_seq,:ingested_at
+                )
+            """)
+
+            for line in lines:
+                try:
+                    e = json.loads(line)
+                    m = e.get("metadata") or {}
+                    await session.execute(insert_sql, {
+                        "event_id":    e.get("event_id", ""),
+                        "store_id":    e.get("store_id", ""),
+                        "camera_id":   e.get("camera_id", ""),
+                        "visitor_id":  e.get("visitor_id", ""),
+                        "event_type":  e.get("event_type", ""),
+                        "timestamp":   e.get("timestamp", ""),
+                        "zone_id":     e.get("zone_id"),
+                        "dwell_ms":    e.get("dwell_ms", 0),
+                        "is_staff":    e.get("is_staff", False),
+                        "confidence":  e.get("confidence", 0.5),
+                        "queue_depth": m.get("queue_depth"),
+                        "sku_zone":    m.get("sku_zone"),
+                        "session_seq": m.get("session_seq", 0),
+                        "ingested_at": now,
+                    })
+                except Exception:
+                    pass
+
+            # Seed demo POS transactions for non-zero conversion rate
+            pos_sql = text("""
+                INSERT OR IGNORE INTO pos_transactions
+                    (store_id, transaction_id, timestamp, basket_value_inr)
+                VALUES (:s, :t, :ts, :a)
+            """)
+            for txn_id, ts, amount in [
+                ("DEMO_TXN_001", "2026-04-10T10:03:00", 850.0),
+                ("DEMO_TXN_002", "2026-04-10T10:03:45", 1240.0),
+                ("DEMO_TXN_003", "2026-04-10T10:04:30", 560.0),
+            ]:
+                try:
+                    await session.execute(pos_sql, {
+                        "s": "STORE_BLR_002", "t": txn_id, "ts": ts, "a": amount
+                    })
+                except Exception:
+                    pass
+
+            await session.commit()
+            logger.info(f"Seeded {len(lines)} events + 3 POS transactions successfully")
+
+        except Exception as e:
+            logger.warning(f"Seed skipped: {e}")
+
 # ---------------------------------------------------------------------------
 # Logging setup — JSON-structured for log aggregators (Loki, CloudWatch, etc.)
 # ---------------------------------------------------------------------------
@@ -67,6 +156,8 @@ async def lifespan(app: FastAPI):
     try:
         await init_db()
         logger.info("Database schema ready")
+        # Auto-seed demo data if DB is empty (for Render/Railway deployments)
+        await _seed_demo_data_if_empty()
     except Exception as e:
         logger.error(f"DB init failed: {e} — continuing (will 503 on DB queries)")
     yield
