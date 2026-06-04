@@ -8,6 +8,21 @@ End-to-end retail analytics pipeline: raw CCTV footage → structured events →
 
 ---
 
+## 🚀 Live Demo (no setup required)
+
+| URL | Description |
+|-----|-------------|
+| **https://store-intelligence-m4v1.onrender.com/docs** | Swagger UI — try all endpoints interactively |
+| https://store-intelligence-m4v1.onrender.com/stores/STORE_BLR_002/metrics?date=2026-04-10 | Store metrics |
+| https://store-intelligence-m4v1.onrender.com/stores/STORE_BLR_002/funnel?date=2026-04-10 | Conversion funnel |
+| https://store-intelligence-m4v1.onrender.com/stores/STORE_BLR_002/heatmap?date=2026-04-10 | Zone heatmap |
+| https://store-intelligence-m4v1.onrender.com/stores/STORE_BLR_002/anomalies?date=2026-04-10 | Anomalies |
+| https://store-intelligence-m4v1.onrender.com/health | Health check |
+
+> **Note:** First request may take ~30 seconds if the free-tier instance is sleeping. Subsequent requests are fast.
+
+---
+
 ## Table of Contents
 
 - [System Overview](#system-overview)
